@@ -31,7 +31,9 @@
 <script type="text/javascript">
 	function our_layers(map,options){
 		var datasets = new L.GeoJSON.AJAX("{% url 'hostels' %}",{
-			
+			onEachFeature: function(feature,layer){
+                layer.bindPopup(feature.properties.name.toString(),feature.properties.hostelid.toString())
+			}
 		});
 
 		datasets.addTo(map);
