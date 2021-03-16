@@ -36,8 +36,30 @@
 			}
 		});
 
+		var points = new L.GeoJSON.AJAX("{% url 'incidences' %}",{
+			pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, {
+                    icon: L.icon({
+                        iconUrl: "static/img/red.png",
+                        iconSize: [24, 28],
+                        iconAnchor: [12, 28],
+                        popupAnchor: [0, -25]
+                    }),
+                    title: feature.properties.NAME,
+                    riseOnHover: true
+                });
+            },
+			onEachFeature: function(feature,layer){
+				layer.bindPopup(feature.properties.name.toString());
+			}
+
+		});
+
 		datasets.addTo(map);
+		points.addTo(map);
 	}
+
+	
 
 </script>
 {% leaflet_map "gis" callback="window.our_layers" %}
