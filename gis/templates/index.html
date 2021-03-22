@@ -14,54 +14,68 @@
 	<link rel="stylesheet" type="text/css" href="{% static 'css/easy-button.css' %}">
 
 	<link rel="stylesheet" type="text/css" href="../static/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.css">	
-	
+	<script type="text/javascript" src="../static/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.js" >   </script>
 	<script type="text/javascript" src="../static/dist/leaflet.ajax.js" >	</script>
 	
-	<script type="text/javascript" src="../static/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.js" ></script>
+	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	<script type="text/javascript" src="{% static 'js/easy-button.js' %}" ></script>	
 </head>
 <script type="text/javascript" src="{% static 'routing/leaflet-routing-machine.js' %}" ></script>
 <body>
-<script type="text/javascript">
-    $("#printBtn").click(function(){
-    $('#map').print();
-    });
-</script>
-<script type="text/javascript">
-	function our_layers(map,options){
-		var datasets = new L.GeoJSON.AJAX("{% url 'hostels' %}",{
-			onEachFeature: function(feature,layer){
-                layer.bindPopup(feature.properties.name.toString(),feature.properties.hostelid.toString())
-			}
+	<script type="text/javascript">
+		$("#printBtn").click(function(){
+		$('#map').print();
 		});
+	</script>
+	<script type="text/javascript">
+		function our_layers(map,options){
+			var osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				maxZoom: 19,
+				attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+			});
+			
+			var datasets = new L.GeoJSON.AJAX("{% url 'hostels' %}",{
+				onEachFeature: function(feature,layer){
+					layer.bindPopup(feature.properties.name.toString(),feature.properties.hostelid.toString())
+				}
+			});
 
-		var points = new L.GeoJSON.AJAX("{% url 'incidences' %}",{
-			pointToLayer: function (feature, latlng) {
-                return L.marker(latlng, {
-                    icon: L.icon({
-                        iconUrl: "static/img/red.png",
-                        iconSize: [24, 28],
-                        iconAnchor: [12, 28],
-                        popupAnchor: [0, -25]
-                    }),
-                    title: feature.properties.NAME,
-                    riseOnHover: true
-                });
-            },
-			onEachFeature: function(feature,layer){
-				layer.bindPopup(feature.properties.name.toString());
+			var points = new L.GeoJSON.AJAX("{% url 'incidences' %}",{
+				pointToLayer: function (feature, latlng) {
+					return L.marker(latlng, {
+						icon: L.icon({
+							iconUrl: "static/img/red.png",
+							iconSize: [24, 28],
+							iconAnchor: [12, 28],
+							popupAnchor: [0, -25]
+						}),
+						title: feature.properties.NAME,
+						riseOnHover: true
+					});
+				},
+				onEachFeature: function(feature,layer){
+					layer.bindPopup(feature.properties.name.toString());
+				}
+
+			});
+
+			datasets.addTo(map);
+			points.addTo(map);
+			
+			var baseLayers = {
+				"OSM":osm
 			}
+			var groupedOverlays = {
+				"Landmarks": {
+					"Hostels": datasets,
+					"Points": points,
+				}
+			};
 
-		});
-
-		datasets.addTo(map);
-		points.addTo(map);
-	}
-
-	
-
-</script>
-{% leaflet_map "gis" callback="window.our_layers" %}
+			L.control.groupedLayers(baseLayers, groupedOverlays).addTo(map);
+		}
+	</script>
+	{% leaflet_map "gis" callback="window.our_layers" %}
 </body>
 </html>
