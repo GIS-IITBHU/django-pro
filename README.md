@@ -1,3 +1,3 @@
 # django-pro
 
-A Geodjango base web-gis project
+A Geodjango based web-gis project
