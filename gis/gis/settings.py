@@ -67,7 +67,7 @@ ROOT_URLCONF = 'gis.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR,'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -136,10 +136,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS=(
+    os.path.join(BASE_DIR,'static'),
+)
 
 LEAFLET_CONFIG = {
     'DEFAULT_CENTER': (25.26522,82.99681699999999),
-    'DEFAULT_ZOOM': 14,
+    'DEFAULT_ZOOM': 16,
     'MAX_ZOOM': 50,
     'MIN_ZOOM': 3,
 }
